@@ -32,8 +32,27 @@ async function run() {
 
     const db=client.db('loan-link') 
     const availableLoan=db.collection('availableLoan') 
+    const userCollection=db.collection('users')
 
 
+     app.post('/users',async(req,res)=>{
+        const user=req.body 
+        const query={email:user.email}
+        const exittingUser=await userCollection.findOne(query) 
+        if(exittingUser){
+           return res.send({message:'user already exiting',insertedId:null} )
+        } 
+        const result=await userCollection.insertOne(user) 
+        res.send(result)
+     })
+ 
+
+      app.get('/users/role/:email',async(req,res)=>{
+         const email=req.params.email
+         const query={email:email} 
+         const user=await userCollection.findOne(query)
+         res.send({role:user?.role})
+      })
 
 
     app.post('/availableloan',async(req,res)=>{
