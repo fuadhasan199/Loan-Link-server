@@ -5,7 +5,7 @@ const cors=require('cors')
 const app = express()
 const port = 3000 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_password}@cluster0.e1kqjp5.mongodb.net/?appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -64,6 +64,13 @@ async function run() {
     app.get('/availableloan',async(req,res)=>{
         const result=await availableLoan.find().toArray()
         res.send(result)
+    }) 
+
+    app.get('/availableloan/:id',async(req,res)=>{
+       const id=req.params.id 
+       const query={_id:new ObjectId(id)}
+       const result=await availableLoan.findOne(query)
+       res.send(result)
     })
 
 
