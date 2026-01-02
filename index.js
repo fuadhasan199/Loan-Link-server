@@ -32,6 +32,7 @@ async function run() {
 
     const db=client.db('loan-link') 
     const availableLoan=db.collection('availableLoan') 
+    const LoanApplication=db.collection('loanApplication')
     const userCollection=db.collection('users')
 
 
@@ -44,6 +45,18 @@ async function run() {
         } 
         const result=await userCollection.insertOne(user) 
         res.send(result)
+     }) 
+
+     app.post('/apply-loan',async(req,res)=>{
+         const applicatiton=req.body 
+          const newApplication={
+             ...applicatiton,
+             status:'pending',
+             paymentStatus:'unpaid',
+             applicatitonDate:new Date().toLocaleDateString(),
+          }
+const result=await LoanApplication.insertOne(newApplication) 
+ res.send(result)
      })
  
 
