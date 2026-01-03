@@ -49,15 +49,21 @@ async function run() {
 
      app.post('/apply-loan',async(req,res)=>{
          const applicatiton=req.body 
-          const newApplication={
-             ...applicatiton,
-             status:'pending',
-             paymentStatus:'unpaid',
-             applicatitonDate:new Date().toLocaleDateString(),
+           const result=await LoanApplication.insertOne(applicatiton) 
+            res.send(result) 
+          
           }
-const result=await LoanApplication.insertOne(newApplication) 
- res.send(result)
+        
+     ) 
+
+     app.post('/my-loans',async(req,res)=>{
+        const email=req.body.email
+        const query={applicationEmail:email}
+        const result=await LoanApplication.find(query).toArray()
+        res.send(result)
      })
+
+     
  
 
       app.get('/users/role/:email',async(req,res)=>{
