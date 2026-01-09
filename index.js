@@ -56,11 +56,19 @@ async function run() {
         
      ) 
 
-     app.post('/my-loans',async(req,res)=>{
+     app.post('/my-loan',async(req,res)=>{
         const email=req.body.email
-        const query={applicationEmail:email}
+        const query={userEmail:email}
         const result=await LoanApplication.find(query).toArray()
         res.send(result)
+     }) 
+
+
+     app.get('/my-loan/:email',async(req,res)=>{
+        const email=req.params.email
+        const query={userEmail:email}
+         const result=await LoanApplication.find(query).toArray()
+          res.send(result)
      })
 
      
@@ -90,7 +98,22 @@ async function run() {
        const query={_id:new ObjectId(id)}
        const result=await availableLoan.findOne(query)
        res.send(result)
-    })
+    })  
+
+
+     app.get('/users',async(req,res)=>{
+        const result=await userCollection.find().toArray() 
+         res.send(result)
+     }) 
+
+     app.get('/users/role/:id',async(req,res)=>{
+       const id=req.params.id 
+       const { role } = req.body;
+        const filter = { _id: new ObjectId(id) };
+         const updateDoc ={ $set:{ role:role}} 
+         const result=await userCollection.updateOne(filter,updateDoc)
+         res.send(result)
+     })
 
 
     // Send a ping to confirm a successful connection
