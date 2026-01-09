@@ -113,7 +113,26 @@ async function run() {
          const updateDoc ={ $set:{ role:role}} 
          const result=await userCollection.updateOne(filter,updateDoc)
          res.send(result)
-     })
+     }) 
+
+    //  view loan application : manager 
+
+     app.get('/loan-applications',async(req,res)=>{
+       const result=await LoanApplication.find().toArray() 
+        res.send(result)
+     }) 
+
+    //  loan approve or reject : manager
+
+    app.patch('/loan-applications/:id',async(req,res)=>{
+       const id=req.params.id 
+        const { status } = req.body
+    const filter = { _id: new ObjectId(id) } 
+
+      const updateDoc={$set:{status:status}}
+       const result=await LoanApplication.updateOne(filter,updateDoc)
+       res.send(result)
+    })
 
 
     // Send a ping to confirm a successful connection
