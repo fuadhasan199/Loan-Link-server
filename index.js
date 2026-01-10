@@ -73,7 +73,7 @@ async function run() {
 
      
  
-
+//  get user role
       app.get('/users/role/:email',async(req,res)=>{
          const email=req.params.email
          const query={email:email} 
@@ -106,14 +106,14 @@ async function run() {
          res.send(result)
      }) 
 
-     app.get('/users/role/:id',async(req,res)=>{
-       const id=req.params.id 
-       const { role } = req.body;
-        const filter = { _id: new ObjectId(id) };
-         const updateDoc ={ $set:{ role:role}} 
-         const result=await userCollection.updateOne(filter,updateDoc)
-         res.send(result)
-     }) 
+    //  app.get('/users/role/:id',async(req,res)=>{
+    //    const id=req.params.id 
+    //    const { role } = req.body;
+    //     const filter = { _id: new ObjectId(id) };
+    //      const updateDoc ={ $set:{ role:role}} 
+    //      const result=await userCollection.updateOne(filter,updateDoc)
+    //      res.send(result)
+    //  }) 
 
     //  view loan application : manager 
 
