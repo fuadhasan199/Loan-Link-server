@@ -98,7 +98,30 @@ async function run() {
        const query={_id:new ObjectId(id)}
        const result=await availableLoan.findOne(query)
        res.send(result)
-    })  
+    }) 
+
+     
+
+    app.get('/availableloan/manager/:email',async(req,res)=>{
+       
+       const email=req.params.email 
+       const query={ createdBy:email }
+       const result=await availableLoan.find(query).toArray()
+       res.send(result) 
+
+
+
+
+    }) 
+
+    app.delete('/availableloan/:id',async(req,res)=>{
+        const id=req.params.id 
+        const query={_id:new ObjectId(id)}
+        const result=await availableLoan.deleteOne(query)
+        res.send(result)
+    }) 
+
+
 
 
      app.get('/users',async(req,res)=>{
@@ -106,14 +129,7 @@ async function run() {
          res.send(result)
      }) 
 
-    //  app.get('/users/role/:id',async(req,res)=>{
-    //    const id=req.params.id 
-    //    const { role } = req.body;
-    //     const filter = { _id: new ObjectId(id) };
-    //      const updateDoc ={ $set:{ role:role}} 
-    //      const result=await userCollection.updateOne(filter,updateDoc)
-    //      res.send(result)
-    //  }) 
+ 
 
     //  view loan application : manager 
 
@@ -130,10 +146,10 @@ async function run() {
     const filter = { _id: new ObjectId(id) } 
 
       const updateDoc={$set:{status:status}}
-       const result=await LoanApplication.updateOne(filter,updateDoc)
+       const result=await LoanApplication.updateOne(filter,updateDoc) 
        res.send(result)
     })
-
+ 
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
