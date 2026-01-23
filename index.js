@@ -101,7 +101,7 @@ async function run() {
     }) 
 
      
-
+    // view manager added loan
     app.get('/availableloan/manager/:email',async(req,res)=>{
        
        const email=req.params.email 
@@ -148,7 +148,25 @@ async function run() {
       const updateDoc={$set:{status:status}}
        const result=await LoanApplication.updateOne(filter,updateDoc) 
        res.send(result)
-    })
+    }) 
+
+   app.patch(`http://localhost:3000/availableloan/:id`,async(req,res)=>{
+        const id=req.params.id
+        const updateData=req.body
+        const filter={_id:new ObjectId(id)}
+         const updateDoc={
+          $set:{
+             title:updateData.title,
+             description:updateData.description,
+             category:updateData.category,
+             maxlimit:updateData.maxlimit
+          }
+         } 
+         const result=await availableLoan.updateOne(filter,updateDoc) 
+         res.send(result)
+   })
+
+
  
 
     // Send a ping to confirm a successful connection
