@@ -145,26 +145,31 @@ async function run() {
         const { status } = req.body
     const filter = { _id: new ObjectId(id) } 
 
-      const updateDoc={$set:{status:status}}
+      const updateDoc={$set:{status:status}
+       ,
+       approvedAt: status==='aproved'? new Date().toDateString():null,    
+    }
        const result=await LoanApplication.updateOne(filter,updateDoc) 
        res.send(result)
     }) 
 
-   app.patch(`http://localhost:3000/availableloan/:id`,async(req,res)=>{
+   app.patch(`/availableloan/:id`,async(req,res)=>{
         const id=req.params.id
         const updateData=req.body
         const filter={_id:new ObjectId(id)}
          const updateDoc={
           $set:{
              title:updateData.title,
-             description:updateData.description,
+             interestRate:updateData.interestRate,
              category:updateData.category,
              maxlimit:updateData.maxlimit
           }
          } 
          const result=await availableLoan.updateOne(filter,updateDoc) 
          res.send(result)
-   })
+   }) 
+
+  
 
 
  
