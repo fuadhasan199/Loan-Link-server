@@ -49,6 +49,9 @@ async function run() {
 
      app.post('/apply-loan',async(req,res)=>{
          const applicatiton=req.body 
+           if(!applicatiton.userEmail){
+              return res.status(400).send({message:'user email is required'})
+           }
            const result=await LoanApplication.insertOne(applicatiton) 
             res.send(result) 
           
@@ -145,14 +148,15 @@ async function run() {
         const { status } = req.body
     const filter = { _id: new ObjectId(id) } 
 
-      const updateDoc={$set:{status:status}
-       ,
-       approvedAt: status==='aproved'? new Date().toDateString():null,    
+      const updateDoc={
+        $set:{
+          status:status, 
+            approvedAt: status==='Approved'? new Date().toDateString():null,  }
     }
        const result=await LoanApplication.updateOne(filter,updateDoc) 
        res.send(result)
     }) 
-
+  
    app.patch(`/availableloan/:id`,async(req,res)=>{
         const id=req.params.id
         const updateData=req.body
@@ -167,7 +171,22 @@ async function run() {
          } 
          const result=await availableLoan.updateOne(filter,updateDoc) 
          res.send(result)
-   }) 
+   })  
+
+  //  admin dashboard statistics 
+   
+  app.patch('/users/role/:id',async(req,res)=>{
+      const id=req.params.id 
+       const { role }=req.body 
+       const filter={_id:new ObjectId(id)}
+        const updateRoleDoc={
+            $set:{
+                role:role
+            }
+        } 
+        const result=await userCollection.updateOne(filter,updateRoleDoc)
+        res.send(result)
+  })
 
   
 
