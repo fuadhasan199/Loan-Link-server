@@ -114,7 +114,14 @@ async function run() {
          } 
          const result=await availableLoan.updateOne(filter,updateDoc)
          res.send(result)
-    })
+    }) 
+
+    // filter loans for the home page 
+     app.get('/home-loans',async(req,res)=>{
+        const query={ showOnHome:true}
+        const result=await availableLoan.find(query).limit(6).toArray() 
+        res.send(result)
+     })
 
      
     // view manager added loan
