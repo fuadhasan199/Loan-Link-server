@@ -103,6 +103,19 @@ async function run() {
        res.send(result)
     }) 
 
+    app.patch('/availableloan/show-on-home/:id',async(req,res)=>{
+        const id=req.params.id 
+        const {showOnHome}=req.body
+         const filter={_id:new ObjectId(id)}
+         const updateDoc={
+              $set:{
+                   showOnHome:showOnHome
+              }
+         } 
+         const result=await availableLoan.updateOne(filter,updateDoc)
+         res.send(result)
+    })
+
      
     // view manager added loan
     app.get('/availableloan/manager/:email',async(req,res)=>{
@@ -186,7 +199,10 @@ async function run() {
         } 
         const result=await userCollection.updateOne(filter,updateRoleDoc)
         res.send(result)
-  })
+  }) 
+
+
+   
 
   
 
