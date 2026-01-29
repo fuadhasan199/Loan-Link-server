@@ -47,6 +47,20 @@ async function run() {
         res.send(result)
      }) 
 
+     app.patch('/users/:id',async(req,res)=>{
+         const id=req.params.id 
+         const {role}=req.body 
+         const filter={_id:new ObjectId(id)} 
+          const updateDoc={
+             $set:{
+                role:role
+             }
+          } 
+          const result=await userCollection.updateOne(filter,updateDoc)
+          res.send(result)
+          
+     })
+
      app.post('/apply-loan',async(req,res)=>{
          const applicatiton=req.body 
            if(!applicatiton.userEmail){
@@ -114,7 +128,7 @@ async function run() {
          } 
          const result=await availableLoan.updateOne(filter,updateDoc)
          res.send(result)
-    }) 
+    })  
 
     // filter loans for the home page 
      app.get('/home-loans',async(req,res)=>{
