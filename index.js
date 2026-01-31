@@ -130,7 +130,7 @@ async function run() {
          res.send(result)
     })  
 
-    // filter loans for the home page 
+    // filter loans for the home page  
      app.get('/home-loans',async(req,res)=>{
         const query={ showOnHome:true}
         const result=await availableLoan.find(query).limit(6).toArray() 
@@ -220,7 +220,22 @@ async function run() {
         } 
         const result=await userCollection.updateOne(filter,updateRoleDoc)
         res.send(result)
-  }) 
+  })  
+
+  app.patch('/users/update/:id',async(req,res)=>{
+     const id=req.params.id 
+     const {role,status}=req.body  
+      const filter={_id:new ObjectId(id)}
+         const updateDoc={
+               $set:{
+                  ...(role && {role:role}),
+                  ...LoanApplication(status && {status:status})
+               } 
+                
+         } 
+         const result=await userCollection.updateOne(filter,updateDoc)
+          res.send(result)
+  })
 
 
    
