@@ -18,11 +18,44 @@ const client = new MongoClient(uri, {
 
 app.use(express.json())
 app.use(cors()) 
+ 
+
+
+
+
+
+// admin sdk 
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./loan-link-admin.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
 
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
-})  
+})   
+
+
+const verifyToken=async(req,res,next)=>{
+    const authorization=req.headers.authorization 
+       if(!authorization){ 
+           return res.status(401).send({message:'unauthorized access'})
+} 
+    const token=authorization.split(' ')[1]  
+     try{
+        const decodedUser=await admin.auth().verifyIdToken(token)
+         req.decodedUser=decodedUser
+          next() 
+     } 
+     catch(error){
+        return res.status(401).send({message:'unauthorized access'})
+     }
+}
+
 
 
 async function run() {
@@ -61,7 +94,7 @@ async function run() {
           
      })
 
-     app.post('/apply-loan',async(req,res)=>{
+     app.post('/apply-loan',verifyToken,async(req,res)=>{
          const applicatiton=req.body 
            if(!applicatiton.userEmail){
               return res.status(400).send({message:'user email is required'})
@@ -81,8 +114,12 @@ async function run() {
      }) 
 
 
-     app.get('/my-loan/:email',async(req,res)=>{
-        const email=req.params.email
+     app.get('/my-loan/:email',verifyToken,async(req,res)=>{
+        const email=req.params.email 
+        const decodedEmail=req.decodedUser.email 
+         if(email !==decodedEmail){
+             return res.status(403).send({message:'forbidden access'})
+         }
         const query={userEmail:email}
          const result=await LoanApplication.find(query).toArray()
           res.send(result)
@@ -95,7 +132,7 @@ async function run() {
          const email=req.params.email
          const query={email:email} 
          const user=await userCollection.findOne(query)
-         res.send({role:user?.role})
+         res.send({role:user?.role , status:user?.status})
       })
 
 
@@ -110,8 +147,12 @@ async function run() {
         res.send(result)
     }) 
 
-    app.get('/availableloan/:id',async(req,res)=>{
+    app.get('/availableloan/:id',verifyToken,async(req,res)=>{
        const id=req.params.id 
+       const decodedEmail=req.decodedUser.email
+         if(!decodedEmail){
+             return res.status(403).send({message:'Forbidden Access'})
+         }
        const query={_id:new ObjectId(id)}
        const result=await availableLoan.findOne(query)
        res.send(result)
@@ -229,7 +270,7 @@ async function run() {
          const updateDoc={
                $set:{
                   ...(role && {role:role}),
-                  ...LoanApplication(status && {status:status})
+                  ...(status && {status:status})
                } 
                 
          } 
