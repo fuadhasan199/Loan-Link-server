@@ -27,7 +27,8 @@ app.use(cors())
 // admin sdk 
 var admin = require("firebase-admin");
 
-var serviceAccount = require("./loan-link-admin.json");
+const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -64,12 +65,14 @@ async function run() {
     await client.connect(); 
 
     const db=client.db('loan-link') 
+     const userCollection=db.collection('users')
     const availableLoan=db.collection('availableLoan') 
     const LoanApplication=db.collection('loanApplication')
-    const userCollection=db.collection('users')
+   
 
 
-     app.post('/users',async(req,res)=>{
+     app.post('/users',async(req,res)=>{ 
+      
         const user=req.body 
         const query={email:user.email}
         const exittingUser=await userCollection.findOne(query) 
@@ -106,7 +109,7 @@ async function run() {
         
      ) 
 
-     app.post('/my-loan',async(req,res)=>{
+     app.post('/my-loan',verifyToken,async(req,res)=>{
         const email=req.body.email
         const query={userEmail:email}
         const result=await LoanApplication.find(query).toArray()
@@ -116,14 +119,13 @@ async function run() {
 
      app.get('/my-loan/:email',verifyToken,async(req,res)=>{
         const email=req.params.email 
-        const decodedEmail=req.decodedUser.email 
-         if(email !==decodedEmail){
-             return res.status(403).send({message:'forbidden access'})
-         }
+         if(req.decodedUser.email !== email){
+        return res.status(403).send({message: 'forbidden access'});
+    }
         const query={userEmail:email}
          const result=await LoanApplication.find(query).toArray()
           res.send(result)
-     })
+     })  
 
      
  
@@ -147,12 +149,9 @@ async function run() {
         res.send(result)
     }) 
 
-    app.get('/availableloan/:id',verifyToken,async(req,res)=>{
+    app.get('/availableloan/:id',async(req,res)=>{
        const id=req.params.id 
-       const decodedEmail=req.decodedUser.email
-         if(!decodedEmail){
-             return res.status(403).send({message:'Forbidden Access'})
-         }
+       
        const query={_id:new ObjectId(id)}
        const result=await availableLoan.findOne(query)
        res.send(result)
@@ -287,7 +286,7 @@ async function run() {
  
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+   //   await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
