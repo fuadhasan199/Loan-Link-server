@@ -25,14 +25,29 @@ app.use(cors())
 
 
 // admin sdk 
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
+ 
+let serviceAccount 
 
-const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
-const serviceAccount = JSON.parse(decoded);
+ try{ 
+   const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
+    const serviceAccount = JSON.parse(decoded);
+ } 
+ catch(error){
+    console.error("Firebase key parsing failed:", error.message);
+ } 
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+ if (serviceAccount) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+}
+
+
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
 
 
 
@@ -53,7 +68,7 @@ const verifyToken=async(req,res,next)=>{
           next() 
      } 
      catch(error){
-        return res.status(401).send({message:'unauthorized access'})
+        return res.status(401).send({message:'unauthorized access', error:error.message})
      }
 }
 
@@ -62,7 +77,7 @@ const verifyToken=async(req,res,next)=>{
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect(); 
+   //   await client.connect(); 
 
     const db=client.db('loan-link') 
      const userCollection=db.collection('users')
