@@ -31,7 +31,7 @@ let serviceAccount
 
  try{ 
    const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
-    const serviceAccount = JSON.parse(decoded);
+     serviceAccount = JSON.parse(decoded);
  } 
  catch(error){
     console.error("Firebase key parsing failed:", error.message);
@@ -112,11 +112,11 @@ async function run() {
           
      })
 
-     app.post('/apply-loan',verifyToken,async(req,res)=>{
+     app.post('/apply-loan',async(req,res)=>{
          const applicatiton=req.body 
-           if(!applicatiton.userEmail){
-              return res.status(400).send({message:'user email is required'})
-           }
+         //   if(!applicatiton.userEmail){
+         //      return res.status(400).send({message:'user email is required'})
+         //   }
            const result=await LoanApplication.insertOne(applicatiton) 
             res.send(result) 
           
